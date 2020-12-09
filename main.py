@@ -98,24 +98,33 @@ class VI():
                     y ** (self.alpha / 2)) * math.exp(-beta * y) * math.exp((lambda_ * y * (x - self.mu) ** 2) / 2)
 
 
+def compute_normal_prob(x, mean, precision):
+    dist = norm.pdf(x, mean, math.sqrt(1/precision))
+    return dist
 
+def compute_gamma_prob(tau, a, b):
+    dist = gamma.pdf(tau, a, loc=0, scale=(1/b))
+    return dist
 
 
 def plot_true_prior(true_mu, true_variance, data):
-    true_tau = 1 / true_variance
+    #true_tau = 1 / true_variance
     #true_tau = true_variance
-    mu_range = np.linspace(-1, +1, 200)
-    tau_range = np.linspace(0, 2, 200)
-    mu_grid, tau_grid = np.meshgrid(mu_range, tau_range)
+    N = len(data)
+    mu_range = np.linspace(true_mu-1, true_mu + 1, 100)
+    tau_range = np.linspace(true_variance - 1, true_variance + 1.5, 100)
+    mu_grid, tau_grid = np.meshgrid(mu_range, tau_range, indexing='ij')
     z = np.zeros_like(mu_grid)
-    mean = np.mean(data)
-    var = np.var(data)
-    a_n = len(data)/2
+    sample_mean = np.mean(data)
+    var = np.sum((data-sample_mean)**2)
+    lambda_ = N
+    a_n = N/2
     b_n = 0.5*var
+    true_tau = a_n/b_n
     for i, mu in enumerate(mu_range):
         for j, tau in enumerate(tau_range):
             #z[i, j] = normal_gamma(data, mu, tau)
-            z[i,j] = norm.pdf(mu, mean, var)*gamma.pdf(tau, a_n, b_n)
+            z[i, j] = compute_normal_prob(mu, true_mu, lambda_*true_tau)*compute_gamma_prob(tau, a_n, b_n)
     plt.contour(mu_grid, tau_grid, z)
     plt.xlabel("Mean")
     plt.ylabel("Precision")
@@ -145,10 +154,11 @@ def normal_gamma(data, my_mu, my_tau):
 
 mu = 0
 sigma = 1
-sample = 15
+sample = 10
+np.random.seed(50)
 x = np.random.normal(loc=mu, scale=sigma, size=sample)
-p_mu = norm(mu, sigma).pdf(x)
-p_tau = gamma.pdf(x, 0)
+#p_mu = norm(mu, sigma).pdf(x)
+#p_tau = gamma.pdf(x, 0)
 plot_true_prior(mu, sigma, x)
 # z = norm.pdf(*np.meshgrid(mu_plot, tau_plot), mu_plot, tau_plot)
 # plt.contour(mu_plot, tau_plot, z)
