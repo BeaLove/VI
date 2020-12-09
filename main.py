@@ -46,7 +46,7 @@ class VI():
         sum = 0
         for x in self.data:
             sum += x ** 2 + self.expected_mu_2nd - 2 * self.expected_mu * x
-        beta = self.b_0 + 0.5 * tau * (
+        beta = self.b_0 + 0.5 * self.lambda_0 * (
                     self.expected_mu_2nd - self.mu_0 ** 2 - 2 * self.expected_mu * self.mu_0) + 0.5 * sum
         # beta = 0.5*sum
         self.expected_tau = self.alpha / beta
@@ -83,19 +83,6 @@ class VI():
             old_tau = new_tau
         return self.mu, new_tau
 
-    def plot_normal_gamma(self, tau, beta):
-        # TO DO does this work??
-
-        mu_plot = np.linspace(-1, +1, 100)
-        tau_plot = np.linspace(0, 2, 100)
-        grid = np.meshgrid(mu_plot, tau_plot)
-        pdf_array = np.zeros((100, 100))
-        for i in range(pdf_array.shape[0]):
-            for j in range(pdf_array.shape[0]):
-                pdf_array[i, j] = self.normal_gamma_pdf(mu_plot[i], tau_plot[j], tau, beta)
-        plt.contour(mu_plot, tau_plot, pdf_array)
-        plt.show()
-
     #def plot_inferred_posterior(self):
 
 
@@ -128,25 +115,7 @@ def plot_prior(mu, tau, lambda_, a_n, b_n, data, color='blue'):
     #plt.show()
 
 
-def normal_gamma(data, my_mu, my_tau):
 
-    ##params: from WIKI P(mu, tau | data) = NormalGamma()
-    lambda_0 = 0
-    a_0 = 0
-    b_0 = 0
-    mu_0 = 0
-    mean = np.mean(data)
-    N = len(data)
-    s = np.var(data)
-    mu = 0 #(lambda_0*mu_0 + N*np.mean(data))/(lambda_0 + N)
-    lambda_ = lambda_0 + N
-    a = a_0 + (N/2)
-    b = 0.5*np.sum([(x_i - mean)**2 for x_i in data])
-    #b = b_0 + 0.5*(N*s + ((lambda_0*N)*(mean - mu_0)**2)/(lambda_0 + N))
-    gamma_a = math.gamma(a)
-    distribution = (((b ** a) * np.sqrt(lambda_)) / (gamma_a * np.sqrt(2 * math.pi))) * (
-            my_tau ** a * 0.5) * np.exp(-b * my_tau) * np.exp(((lambda_ * my_tau) * ((my_mu - mu) ** 2)) / 2)
-    return distribution
 
 
 mu = 0
