@@ -126,7 +126,7 @@ def plot_prior(mu, tau, lambda_, a_n, b_n, data, color='blue'):
 
 mu = 0
 sigma = 1
-sample = 100
+sample = 150
 np.random.seed(50)
 x = np.random.normal(loc=mu, scale=sigma, size=sample)
 #p_mu = norm(mu, sigma).pdf(x)
