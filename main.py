@@ -51,6 +51,7 @@ class VI():
         # beta = 0.5*sum
         self.expected_tau = self.alpha / beta
         self.lambda_n = (self.lambda_0+self.n)*self.expected_tau
+        print("lamnda_n", self.lambda_n)
         return beta
 
     def update_mu_elbo(self, beta):
@@ -71,16 +72,21 @@ class VI():
             print("beta", new_beta)
             print("1/tau", 1 / new_tau)
             print("1/expected tau", 1 / self.expected_tau)
-            plot_prior(self.actual_mu, self.actual_tau, self.actual_lambda, self.actual_a, self.actual_b, self.data)
-            plt.subplot()
-            plot_prior(self.mu, new_tau, self.lambda_n, self.alpha, new_beta, self.data, color='green')
-            plt.show()
+            #plot_prior(self.actual_mu, self.actual_tau, self.actual_lambda, self.actual_a, self.actual_b, self.data)
+            #plt.subplot()
+            #plot_prior(self.mu, new_tau, self.lambda_n, self.alpha, new_beta, self.data, color='green')
+            #plt.show()
             diff_tau = abs(new_tau - old_tau)
             diff_beta = abs(new_beta - old_beta)
             print("diff_tau", diff_tau)
             print("diff_beta", diff_beta)
             old_beta = new_beta
             old_tau = new_tau
+        print("converged")
+        plot_prior(self.actual_mu, self.actual_tau, self.actual_lambda, self.actual_a, self.actual_b, self.data)
+        plt.subplot()
+        plot_prior(self.mu, self.expected_tau, self.lambda_n, self.alpha, new_beta, self.data, color='green')
+        plt.show()
         return self.mu, new_tau
 
     #def plot_inferred_posterior(self):
@@ -109,7 +115,7 @@ def plot_prior(mu, tau, lambda_, a_n, b_n, data, color='blue'):
         for j, tau_ in enumerate(tau_range):
             #z[i, j] = normal_gamma(data, mu, tau)
             z[i, j] = compute_normal_prob(mu_, mu, lambda_*tau)*compute_gamma_prob(tau_, a_n, b_n)
-    plt.contour(mu_grid, tau_grid, z, color=color)
+    plt.contour(mu_grid, tau_grid, z, colors=color)
     plt.xlabel("Mean")
     plt.ylabel("Precision")
     #plt.show()
@@ -120,7 +126,7 @@ def plot_prior(mu, tau, lambda_, a_n, b_n, data, color='blue'):
 
 mu = 0
 sigma = 1
-sample = 10
+sample = 100
 np.random.seed(50)
 x = np.random.normal(loc=mu, scale=sigma, size=sample)
 #p_mu = norm(mu, sigma).pdf(x)
@@ -137,3 +143,4 @@ start_tau = np.random.uniform(0,1)
 #start_tau = 0.4
 print('start tau', start_tau)
 vi.fit(start_tau)
+
